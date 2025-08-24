@@ -76,8 +76,7 @@ def generate_synthetic_device(idx):
     # Pick form_factor logically
     form_factor = random.choice(list(logic.keys()))
     rules = logic[form_factor]
-
-    # Pick AI model + tasks logically
+  
     model_type = random.choice(list(ai_logic.keys()))
     tasks = random.sample(ai_logic[model_type], k=min(2, len(ai_logic[model_type])))
 
@@ -139,12 +138,7 @@ def create_hybrid_dataset(n_synthetic=50000, real_fda_path="real_fda_devices.jso
     real_devices = load_real_fda_devices(real_fda_path)
     
     dataset = synthetic_devices + real_devices
-    
-    # Save JSON
-    with open("hybrid_dataset.json", "w") as f:
-        json.dump(dataset, f, indent=2)
-    
-    # Save CSV (flattened for ML)
+
     with open("hybrid_dataset.csv", "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -204,7 +198,6 @@ def export_multitask_csv(json_path="hybrid_dataset.json", csv_path="multitask_da
             os = d["software"]["os"]
             ui = d["user_interface"]["type"]
 
-            # combine structured fields into one text field for BERT input
             text_input = f"{d['hardware']['processor']} {d['hardware']['memory']} {ff} " \
                          f"{os} {d['software']['programming_language']} {' '.join(d['software']['frameworks'])} " \
                          f"{d['ai_models']['model_type']} {' '.join(d['ai_models']['tasks'])}"
@@ -221,4 +214,5 @@ def export_multitask_csv(json_path="hybrid_dataset.json", csv_path="multitask_da
 # ---------- Run ----------
 if __name__ == "__main__":
     create_hybrid_dataset(n_synthetic=50000, real_fda_path="real_fda_devices.json")
-    export_multitask_csv("hybrid_dataset.json", "multitask_dataset.csv")
+
+    export_multitask_csv("multitask_dataset.csv")
